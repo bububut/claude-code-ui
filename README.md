@@ -28,7 +28,7 @@ $ gptcode
 
 ## Misc.
 ### Using .env for OpenAI key
-You can put a .env in the working directory to load the `OPENAI_API_KEY` environment variable.
+You can put a .env in the working directory to load the `ANTHROPIC_API_KEY` environment variable.
 
 ### Configurables
 Set the `API_PORT`, `WEB_PORT`, `SNAKEMQ_PORT` variables to override the defaults.

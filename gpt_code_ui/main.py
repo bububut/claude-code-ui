@@ -5,6 +5,8 @@
 
 import sys
 import logging
+log_format = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+logging.basicConfig(level=logging.INFO, format=log_format)
 import asyncio
 import time
 import webbrowser
@@ -32,11 +34,14 @@ def run_kernel_program():
 
 def setup_logging():
     log_format = "%(asctime)s [%(levelname)s]: %(message)s"
-    logging.basicConfig(level=logging.INFO, format=log_format)
-    log_filename = "app.log"
-    file_handler = logging.FileHandler(log_filename)
-    file_handler.setFormatter(logging.Formatter(log_format))
-    logging.getLogger().addHandler(file_handler)
+    logging.basicConfig(level=logging.DEBUG, format=log_format)
+    logging.debug('debug message')
+    logging.error('error message')
+    # log_filename = "app.log"
+    # file_handler = logging.FileHandler(log_filename)
+    # file_handler.setFormatter(logging.Formatter(log_format))
+    # file_handler.setLevel(logging.DEBUG)
+    # logging.getLogger().addHandler(file_handler)
 
 def print_color(text, color="gray"):
     # Default to gray
@@ -68,7 +73,7 @@ def print_banner():
         print_color("Contribute to GPT-Code UI at https://github.com/ricklamers/gpt-code-ui")   
 
 def main():
-    setup_logging()
+    # setup_logging()
 
     webapp_process = Process(target=run_webapp)
     kernel_program_process = Process(target=run_kernel_program)

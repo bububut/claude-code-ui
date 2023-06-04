@@ -17,8 +17,7 @@ from gpt_code_ui.kernel_program.main import APP_PORT as KERNEL_APP_PORT
 
 load_dotenv('.env')
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-OPENAI_BASE_URL = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
 UPLOAD_FOLDER = 'workspace/'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -52,7 +51,7 @@ def allowed_file(filename):
     return True
 
 
-async def get_code(user_prompt, user_openai_key=None, model="gpt-3.5-turbo"):
+async def get_code(user_prompt, user_api_key=None, model="claude-v1.3"):
 
     prompt = f"First, here is a history of what I asked you to do earlier. The actual prompt follows after ENDOFHISTORY. History:\n\n{message_buffer.get_string()}ENDOFHISTORY.\n\nWrite Python code that does the following: \n\n{user_prompt}\n\nNote, the code is going to be executed in a Jupyter Python kernel.\n\nLast instruction, and this is the most important, just return code. No other outputs, as your full response will directly be executed in the kernel. \n\nTeacher mode: if you want to give a download link, just print it as <a href='/download?file=INSERT_FILENAME_HERE'>Download file</a>. Replace INSERT_FILENAME_HERE with the actual filename. So just print that HTML to stdout. No actual downloading of files!"
 
@@ -67,9 +66,9 @@ async def get_code(user_prompt, user_openai_key=None, model="gpt-3.5-turbo"):
         "temperature": 0.7,
     }
 
-    final_openai_key = OPENAI_API_KEY
-    if user_openai_key:
-        final_openai_key = user_openai_key
+    final_openai_key = ANTHROPIC_API_KEY
+    if user_api_key:
+        final_openai_key = user_api_key
 
     headers = {
         "Content-Type": "application/json",
@@ -77,7 +76,7 @@ async def get_code(user_prompt, user_openai_key=None, model="gpt-3.5-turbo"):
     }
 
     response = requests.post(
-        f"{OPENAI_BASE_URL}/v1/chat/completions",
+        # f"{OPENAI_BASE_URL}/v1/chat/completions",
         data=json.dumps(data),
         headers=headers,
     )
@@ -102,7 +101,7 @@ async def get_code(user_prompt, user_openai_key=None, model="gpt-3.5-turbo"):
 
 # We know this Flask app is for local use. So we can disable the verbose Werkzeug logger
 log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+log.setLevel(logging.DEBUG)
 
 cli = sys.modules['flask.cli']
 cli.show_server_banner = lambda *x: None
@@ -125,6 +124,8 @@ def index():
 
 @app.route('/api/<path:path>', methods=["GET", "POST"])
 def proxy_kernel_manager(path):
+    logger = logging.getLogger('webapp_main')
+    logger.info(f'/api {path=}')
     if request.method == "POST":
         resp = requests.post(
             f'http://localhost:{KERNEL_APP_PORT}/{path}', json=request.get_json())
@@ -167,15 +168,17 @@ def inject_context():
 
 @app.route('/generate', methods=['POST'])
 def generate_code():
+    logger = logging.getLogger('webapp_main')
+    logger.info(f'/generate')
     user_prompt = request.json.get('prompt', '')
-    user_openai_key = request.json.get('openAIKey', None)
+    user_api_key = request.json.get('ApiKey', None)
     model = request.json.get('model', None)
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
     code, status = loop.run_until_complete(
-        get_code(user_prompt, user_openai_key, model))
+        get_code(user_prompt, user_api_key, model))
     loop.close()
 
     # Append all messages to the message buffer for later use
@@ -202,4 +205,7 @@ def upload_file():
 
 
 if __name__ == '__main__':
+    print('hello in main in webapp')
+    logger = logging.getLogger()
+    logger.error('hello in main in webapp')
     app.run(host="0.0.0.0", port=APP_PORT, debug=True, use_reloader=False)

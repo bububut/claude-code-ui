@@ -30,7 +30,7 @@ function App() {
     MODELS[0].name
   );
 
-  let [openAIKey, setOpenAIKey] = useLocalStorage<string>("OpenAIKey", "");
+  let [ApiKey, setApiKey] = useLocalStorage<string>("ApiKey", "");
 
   let [messages, setMessages] = useState<Array<MessageDict>>(
     Array.from([
@@ -111,7 +111,7 @@ function App() {
         body: JSON.stringify({
           prompt: userInput,
           model: selectedModel,
-          openAIKey: openAIKey,
+          ApiKey: ApiKey,
         }),
       });
 
@@ -229,9 +229,9 @@ function App() {
           onSelectModel={(val: string) => {
             setSelectedModel(val);
           }}
-          openAIKey={openAIKey}
-          setOpenAIKey={(val: string) => {
-            setOpenAIKey(val);
+          ApiKey={ApiKey}
+          setApiKey={(val: string) => {
+            setApiKey(val);
           }}
         />
         <div className="main">
