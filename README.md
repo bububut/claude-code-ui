@@ -1,4 +1,8 @@
-<img src="https://github.com/ricklamers/gpt-code-ui/assets/1309307/9ad4061d-2e26-4407-9431-109b650fb022" alt="GPT-Code logo" width=240 />
+# Claude Code
+
+This project is a fork of https://github.com/ricklamers/gpt-code-ui
+
+And change it to use the Anthropic Claude API
 
 An open source implementation of OpenAI's ChatGPT [Code interpreter](https://openai.com/blog/chatgpt-plugins#code-interpreter).
 
